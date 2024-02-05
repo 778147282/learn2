@@ -1,0 +1,2852 @@
+
+const { createApp } = Vue
+
+
+const multicall_abi = [
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentBlockTimestamp",
+    "outputs": [
+      {
+        "name": "timestamp",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "components": [{ "name": "target", "type": "address" }, { "name": "callData", "type": "bytes" }],
+        "name": "calls",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "aggregate",
+    "outputs": [
+      {
+        "name": "blockNumber",
+        "type": "uint256"
+      },
+      {
+        "name": "returnData",
+        "type": "bytes[]"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getLastBlockHash",
+    "outputs": [
+      {
+        "name": "blockHash",
+        "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "addr",
+        "type": "address"
+      }
+    ],
+    "name": "getEthBalance",
+    "outputs": [
+      {
+        "name": "balance",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentBlockDifficulty",
+    "outputs": [
+      {
+        "name": "difficulty",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentBlockGasLimit",
+    "outputs": [
+      {
+        "name": "gaslimit",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getCurrentBlockCoinbase",
+    "outputs": [
+      {
+        "name": "coinbase",
+        "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "blockNumber",
+        "type": "uint256"
+      }
+    ],
+    "name": "getBlockHash",
+    "outputs": [
+      {
+        "name": "blockHash",
+        "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+
+const babyBurnToken_ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "collectWallet",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "burnMint",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Approval",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [],
+    "name": "AutoNukeLP",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensSwapped",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethReceived",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensIntoLiqudity",
+        "type": "uint256"
+      }
+    ],
+    "name": "SwapAndLiquify",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "automatedMarketMakerPairs",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "blacklist",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "buyFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "deadAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "subtractedValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "decreaseAllowance",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "accounts",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "excluded",
+        "type": "bool"
+      }
+    ],
+    "name": "excludeFromFeesList",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "gasForProcessing",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "addedValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "increaseAllowance",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "investmentAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isDividendExempt",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isExcludedFromFees",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastLpBurnTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "limitAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lpBurnEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lpBurnFrequency",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "marketingAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "marketingFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "name",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "percentForLPBurn",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "refluxFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sellFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_account",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isBlack",
+        "type": "bool"
+      }
+    ],
+    "name": "setAccountBlack",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "accounts",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isBlack",
+        "type": "bool"
+      }
+    ],
+    "name": "setAccountBlackList",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_frequencyInSeconds",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_percent",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_Enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "setAutoLPBurnSettings",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "pair",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "value",
+        "type": "bool"
+      }
+    ],
+    "name": "setAutomatedMarketMakerPair",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_investmentAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setInvestmentAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setLimitAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_marketingAddress",
+        "type": "address"
+      }
+    ],
+    "name": "setMarketingWalletAddress",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_refluxFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_marketingFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setShareFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_enabled",
+        "type": "bool"
+      }
+    ],
+    "name": "setSwapAndLiquifyEnabled",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setSwapTokensAtAmount",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setTransferFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_buyFee",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_sellFee",
+        "type": "uint256"
+      }
+    ],
+    "name": "setTxFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "startAddLP",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "startAddLPBlock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "startTrade",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "startTradeBlock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapAndLiquifyEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "swapTokensAtAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "transferFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uintDecimals",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uniswapPair",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uniswapRouter",
+    "outputs": [
+      {
+        "internalType": "contract IUniswapV2Router02",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateGasForProcessing",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newAddress",
+        "type": "address"
+      }
+    ],
+    "name": "updateUniswapV2Router",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
+]
+
+const mint_ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "HasClaimed",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdrawal",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "count",
+        "type": "uint256"
+      }
+    ],
+    "name": "claim",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimPeriodEnd",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimPeriodStart",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeMint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxClamins",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minClamins",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_totalClaimable",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_claimPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_claimAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setClaimDatas",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minClamin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxClamin",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinOrMaxClamin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      }
+    ],
+    "name": "setToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_userClaimLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "setUserClaimLimit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "startMint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "teamAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "token",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalClaimable",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "userClaimLimit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userClaims",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+
+const investment_ABI = [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_babyBurn",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Investment",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnershipTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensSwapped",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "ethReceived",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokensIntoLiqudity",
+        "type": "uint256"
+      }
+    ],
+    "name": "SwapAndLiquify",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "investor",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "Withdrawal",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "BurnTotalAmounts",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GlobalUsers",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "LiquidityLoss",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "UnRevenueBnb",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "accBNBPerShare",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "point",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "taskId",
+        "type": "uint256"
+      }
+    ],
+    "name": "addReceiver",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "babyBurn",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeLimit",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "closeRemainingDistribution",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "fundingLimit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "start",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "end",
+        "type": "uint256"
+      }
+    ],
+    "name": "getLogs",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pendingReward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "multiple",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "time",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct SimpleInvestmentContract.InvestLogs[]",
+        "name": "",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "invest",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastRewardTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "marketWallet1",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "marketWallet2",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxProfitMultiplier",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "pendingBNB",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "receiverIndex",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "receivers",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "taskId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "point",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_babyBurn",
+        "type": "address"
+      }
+    ],
+    "name": "setBabyBurn",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_close",
+        "type": "bool"
+      }
+    ],
+    "name": "setCloseLimit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_close",
+        "type": "bool"
+      }
+    ],
+    "name": "setCloseRemainingDistribution",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_fundingLimit",
+        "type": "uint256"
+      }
+    ],
+    "name": "setFundingLimit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_marketWallet",
+        "type": "address"
+      }
+    ],
+    "name": "setMarketWallet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_multiplier",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxProfitMultiplier",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "point1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "point2",
+        "type": "uint256"
+      }
+    ],
+    "name": "setReceiverRatio",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "setUserAmountLimit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenPoint",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalInvestment",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "totalMultiplierInvestment",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "uniswapRouter",
+    "outputs": [
+      {
+        "internalType": "contract IUniswapV2Router02",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "point",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateReceiver",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "userFundingMaxLimit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "userFundingMinLimit",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userInvestments",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "lastUpdateTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "rewardDebt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pendingReward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "claimReward",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "unMultiplierAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "multiplierAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawETH",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "stateMutability": "payable",
+    "type": "receive"
+  }
+]
+
+const ethChainId = 56
+
+const MaxInt256 = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+
+const addresses = {
+
+  multicall: {
+    97: '0x301907b5835a2d723Fe3e9E8C5Bc5375d5c1236A',
+    42161: '0x842eC2c7D803033Edf55E478F461FC547Bc54EB2',
+    56: '0x1Ee38d535d541c55C9dae27B12edf090C608E6Fb',
+    1116: '0xE294368ad130919edeEbFD877FD7Bb69b6cC1DDb',
+    1: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+    66: '0x4Dbb06bCdd902F172ee0Af6182896032f04eE04e',
+    109: '0x417Cf56c334CCC2Db9148673819760B7613B5c44'
+  },
+  mint: {
+    56: '0x1906A2E61A0C21d39888DDc70b79790cF841BCea',
+    97: '0xe8567A0891fDb21fb6a38ab609149a0f1CA601bd',
+  },
+  token: {
+    56: '0xc79b7bE39BD8fBfA046c4cdB7e2e3a471FBEfb8A',
+    97: '0x10152FDd3A116beE66f9d4065cE61fc0A8be78Eb',
+  },
+  investment: {
+    56: '0x81740ECa736C71027A21461Fa4CCF67A1f35C926',
+    97: '0x2d9Ea1ab3EEc6fF1Af5a4c45F0592b9C93e74a4c',
+  }
+
+}
+// 0xd49C0Ab3ba5F67FDc0eD7A6c9C166E7bD96d7ADC
+
+
+const provider = {
+  [97]: 'https://bsc-testnet.public.blastapi.io',
+  [1]: 'https://eth.llamarpc.com',
+  [56]: 'https://bsc.publicnode.com',
+  [42161]: 'https://arbitrum-one.public.blastapi.io',
+  [66]: 'https://oktc-mainnet.public.blastapi.io',
+  [109]: ' https://www.shibrpc.com',
+}
+
+// const simpleRpcProvider = new ethers.providers.StaticJsonRpcProvider(provider[ethChainId])
+const simpleRpcProvider = new ethers.providers.JsonRpcProvider(provider[ethChainId])
+
+const getProvider = (chainId) => {
+  const simpleRpcProvider = new ethers.providers.JsonRpcProvider(provider[chainId])
+  return simpleRpcProvider
+}
+
+const multicall = async (chainId, abi, calls) => {
+  const multi = new ethers.Contract(addresses.multicall[chainId], multicall_abi, getProvider(chainId))
+  const itf = new ethers.utils.Interface(abi)
+
+  const calldata = calls.map((call) => ({
+    target: call.address.toLowerCase(),
+    callData: itf.encodeFunctionData(call.name, call.params),
+  }))
+
+  const { returnData } = await multi.aggregate(calldata)
+
+  const res = returnData.map((call, i) => itf.decodeFunctionResult(calls[i].name, call))
+
+  return res
+}
+
+
+
+const match = (value) => {
+  return value.match(/reverted[:|A-z|\-|\s|0-9]+/)?.toString()
+}
+
+
+const toFixed = (value) => {
+  const { utils, bingNumber } = ethers
+  // ethers.bingNumber.from(value).mul(1000)
+
+  return Math.floor(Number(utils.formatUnits(ethers.BigNumber.from(value).mul(1000), 18))) / 1000
+}
+
+
+
+const requestPublicData = async (chainId, account) => {
+  const { utils } = ethers
+
+  const tokenCalls = ['UnRevenueBnb', 'GlobalUsers', 'BurnTotalAmounts', 'totalInvestment', 'maxProfitMultiplier', 'fundingLimit', 'userFundingMinLimit', 'userFundingMaxLimit', 'closeLimit'].map((method) => {
+    return {
+      address: addresses.investment[chainId],
+      name: method,
+      params: [],
+    }
+  })
+
+  const mintCalls = ['totalClaimable', 'claimPrice', 'claimAmount', 'minClamins', 'maxClamins', 'claimPeriodEnd', 'claimPeriodStart', 'userClaimLimit'].map((method) => {
+    return {
+      address: addresses.mint[chainId],
+      name: method,
+      params: [],
+    }
+  })
+
+  const mainCalls = [
+    {
+      address: addresses.multicall[chainId],
+      name: 'getEthBalance',
+      params: [account],
+    },
+    {
+      address: addresses.token[chainId],
+      name: 'startTradeBlock',
+      params: [],
+    },
+    {
+      address: addresses.investment[chainId],
+      name: 'userInvestments',
+      params: [account],
+    },
+    {
+      address: addresses.investment[chainId],
+      name: 'pendingBNB',
+      params: [account],
+    },
+    {
+      address: addresses.investment[chainId],
+      name: 'getLogs',
+      params: [account, 0, 100],
+    },
+    {
+      address: addresses.mint[chainId],
+      name: 'userClaims',
+      params: [account],
+    },
+  ]
+
+  const ABI = multicall_abi.concat(mint_ABI).concat(babyBurnToken_ABI).concat(investment_ABI)
+  const CALLS = tokenCalls.concat(mintCalls).concat(mainCalls)
+
+  const result = await multicall(chainId, ABI, CALLS)
+  const [
+    [UnRevenueBnb],
+    [GlobalUsers],
+    [BurnTotalAmounts],
+    [totalInvestment],
+    [maxProfitMultiplier],
+    [fundingLimit],
+    [userFundingMinLimit],
+    [userFundingMaxLimit],
+    [closeLimit],
+    [totalClaimable],
+    [claimPrice],
+    [claimAmount],
+    [minClamins],
+    [maxClamins],
+    [claimPeriodEnd],
+    [claimPeriodStart],
+    [userClaimLimit],
+    [balance],
+    [startTradeBlock],
+    userInvestments,
+    [pendingBNB],
+    [getLogs],
+    [userClaims]
+  ] = result
+
+  console.log(result)
+  console.log(getLogs)
+
+  let width = Number(totalClaimable.toString()) === 50000 ? '0%' : `${Number((50000 - Number(totalClaimable.toString())) * 100 / 50000).toFixed(3)}%`
+  return {
+    user: {
+      unRevenueBnb: Number(utils.formatEther(UnRevenueBnb)).toFixed(3),
+      globalUsers: Number(GlobalUsers.toString()),
+      burnTotalAmounts: Number(utils.formatEther(BurnTotalAmounts)).toFixed(3),
+      totalInvestment: Number(utils.formatEther(totalInvestment)).toFixed(3),
+      maxProfitMultiplier: Number(maxProfitMultiplier.toString()),
+      fundingLimit: Number(utils.formatEther(fundingLimit)),
+      userFundingMinLimit: Number(utils.formatEther(userFundingMinLimit)),
+      userFundingMaxLimit: Number(utils.formatEther(userFundingMaxLimit)),
+      closeLimit,
+
+
+      totalClaimable: Number(totalClaimable.toString()),
+      claimPrice: Number(utils.formatEther(claimPrice)),
+      claimAmount: Number(utils.formatEther(claimAmount)),
+      minClamins: Number(minClamins.toString()),
+      maxClamins: Number(maxClamins.toString()),
+      claimPeriodEnd: Number(claimPeriodEnd.toString()),
+      claimPeriodStart: Number(claimPeriodStart.toString()),
+      userClaimLimit:  Number(userClaimLimit.toString()),
+      userClaims:   Number(userClaims.toString()),
+      style: {
+        width
+      },
+
+
+      balance: Number(utils.formatEther(balance)),
+      startTradeBlock: Number(startTradeBlock.toString()),
+      invest: {
+        amount: Number(utils.formatEther(userInvestments.amount)).toFixed(3),
+        claimReward: Number(utils.formatEther(userInvestments.claimReward)).toFixed(3),
+        unMultiplierAmount: Number(utils.formatEther(userInvestments.unMultiplierAmount)).toFixed(3),
+        multiplierAmount: Number(utils.formatEther(userInvestments.multiplierAmount)),
+        pendingReward: Number(utils.formatEther(pendingBNB)).toFixed(3),
+      },
+      logs: getLogs.map(({ amount, pendingReward, multiple, time }) => {
+        return {
+          amount: Number(utils.formatEther(amount.toString())).toFixed(3),
+          pendingReward: Number(utils.formatEther(pendingReward.toString())).toFixed(3),
+          multiple: `${Number(multiple.toString()) + 1}X`,
+          time: Number(time.toString())
+        }
+      }).sort((a, b) => b.time - a.time)
+    }
+  }
+}
+function convertToTimeUnits (seconds) {
+  const dayInSeconds = 24 * 60 * 60 * 1000
+  const hourInSeconds = 60 * 60 * 1000
+  const minuteInSeconds = 60 * 1000
+
+  const days = Math.floor(seconds / dayInSeconds)
+  const hours = Math.floor((seconds % dayInSeconds) / hourInSeconds)
+  const minutes = Math.floor((seconds % hourInSeconds) / minuteInSeconds)
+
+  return `${days < 10 ? `0${days}` : days} :${hours < 10 ? `0${hours}` : hours} : ${minutes < 10 ? `0${minutes}` : minutes} minute`
+}
+
+createApp({
+  data () {
+    return {
+      code: 'zh',
+      loading: true,
+      link: false,
+      showAccount: 'Connect',
+      showRef: undefined,
+      ref: undefined,
+      inviteLink: '',
+      account: undefined,
+      inputAmount: '',
+      mintValue: 0,
+      style1: {
+        background: 'linear-gradient(92deg, #df2512, #f1b611)'
+      },
+      style2: {
+        background: '#9E9E9E'
+      },
+      token: '',
+      user: {
+        unRevenueBnb: 0,
+        globalUsers: 0,
+        burnTotalAmounts: 0,
+        totalInvestment: 0,
+        maxProfitMultiplier: 1,
+        userFundingMinLimit: 0.1,
+        userFundingMaxLimit: 3,
+        closeLimit: true,
+
+        totalClaimable: 50000,
+        claimPrice: 0.004,
+        claimAmount: 200,
+        minClamins: 1,
+        maxClamins: 30,
+        claimPeriodEnd: 0,
+        claimPeriodStart: 0,
+        userClaimLimit: 20,
+        userClaims:  0,
+        style: {
+          width: `${0}%`
+        },
+
+        balance: 0,
+        startTradeBlock: 0,
+        invest: {
+          amount: 0,
+          claimReward: 0,
+          unMultiplierAmount: 0,
+          multiplierAmount: 0,
+          pendingReward: 0
+        }
+      },
+      contract: {
+        investment: undefined,
+        mint: undefined,
+      },
+      status: {
+        mint: false,
+        usdtApprove: false,
+        filApprove: false,
+        adtnft: false,
+        isLoading: false,
+        loadingText: '',
+        isReward: false,
+        copy: false,
+        isApprove: false,
+        isMint: false,
+        isWithdraw: false,
+        subscribe: false,
+        text: 'clamin error'
+      }
+    }
+  },
+
+  methods: {
+
+    async checkLink () {
+      console.log(this.link)
+      if (this.link === false) {
+        this.walletLink()
+      } else {
+        this.deactivate()
+      }
+    },
+    async walletLink () {
+      const { ethereum, location } = window
+      // if (!ethereum) {
+      //   alert("Please install the metamask wallet first ")
+      //   return
+      // }
+      console.log('walletLink')
+      const provider = new ethers.providers.Web3Provider(ethereum)
+      let account = []
+      let chainId
+      try {
+        chainId = await provider.send('eth_chainId')
+        chainId = parseInt(chainId, 16)
+
+        if (chainId === ethChainId) {
+          account = await provider.send('eth_requestAccounts', [`0x${ethChainId.toString(16)}`])
+          console.log(account)
+        } else {
+
+          try {
+            await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${ethChainId.toString(16)}` }])
+            account = await provider.send('eth_requestAccounts', [])
+          } catch (error) {
+            if (error.code === 4902) {
+              await provider.send('wallet_switchEthereumChain', [{
+                chainId: `0x${ethChainId.toString(16)}`,
+                chainName: 'Binance Smart Chain Mainnet',
+                nativeCurrency: {
+                  name: 'BNB',
+                  symbol: 'bnb',
+                  decimals: 18
+                },
+                rpcUrls: RpcUrls[ethChainId],
+                blockExplorerUrls: [BlockExplorerUrls[ethChainId]]
+
+              }])
+              account = await provider.send('eth_requestAccounts', [`0x${ethChainId.toString(16)}`])
+
+            }
+          }
+        }
+      } catch (error) {
+        if (error.code === 4001) {
+          alert('User denied connection')
+        }
+      }
+
+      if (account.length >= 1) {
+        this.account = account[0]
+        this.showAccount = account[0].slice(0, 4) + '...' + account[0].slice(-2)
+        this.link = true
+        this.inviteLink = `${this.inviteLink}${this.account}`
+
+        console.log(this.account)
+        try {
+          requestPublicData(chainId, this.account).then((data) => {
+            this.user = data.user
+            console.log(data.user)
+          })
+        } catch (e) {
+          console.log(e)
+        }
+        this.contract.investment = new ethers.Contract(addresses.investment[ethChainId], investment_ABI, provider.getSigner())
+        this.contract.mint = new ethers.Contract(addresses.mint[ethChainId], mint_ABI, provider.getSigner())
+      }
+
+      this.token = addresses.token[ethChainId]
+
+
+      const myString = location.href.split('?')[1]
+      const pattern = /0x[a-fA-F0-9]{40}/g  // 匹配以 "0x" 开头，后面跟着 40 个十六进制字符的字符串
+      if (myString) {
+        this.ref = myString.match(pattern)[0]
+        localStorage.setItem('ref', this.ref)
+      } else {
+        this.ref = localStorage.getItem('ref')
+      }
+      this.showRef = this.user?.referrer?.ref || this.ref
+      this.loading = false
+
+    },
+
+    async invest (value) {
+      console.log(`value: ${value}`)
+      const isValue = value !== ''
+      const isClone = this.user.startTradeBlock !== 0
+      const isFundingLimit = (Number(value) + Number(this.user.totalInvestment)) <= Number(this.user.fundingLimit)
+      console.log(`isFundingLimit: ${isFundingLimit}`)
+      const isMin = !this.user.closeLimit || (Number(value) + Number(this.user.invest.amount)) >= Number(this.user.userFundingMinLimit)
+      const isMax = !this.user.closeLimit || (Number(value) + Number(this.user.invest.amount)) <= Number(this.user.userFundingMaxLimit)
+      const isMaxValue = Number(value) <= Number(this.user.balance)
+
+      if (isValue && isClone && isFundingLimit && isMin && isMax && isMaxValue) {
+        this.status.isLoading = true
+        this.status.loadingText = 'Invest ...'
+        $this = this
+        const asyncMint = async () => {
+          try {
+            // const gasLimit = await estimateGas($this.contract.adtnft, 'mint', [number, $this.ref || ethers.constants.AddressZero], 1000)
+            const tx = await this.contract.investment.invest({ value: ethers.utils.parseEther(value) }) // mint(number, $this.ref || ethers.constants.AddressZero)
+            await tx.wait()
+            const data = await requestPublicData(ethChainId, this.account)
+            $this.user = data.user
+            $this.status.isLoading = false
+
+            $this.status.mint = true
+            console.log(this.status.mint)
+            $this.status.text = 'Invest success'
+          } catch (e) {
+            $this.status.isLoading = false
+            $this.status.mint = true
+            $this.status.text = 'Invest error'
+            console.log(e)
+            if (e.code !== 4001) {
+              $this.status.text = match(e.toString()) || e.toString()
+            } else {
+              $this.status.text = 'User Rejected'
+            }
+          }
+        }
+        asyncMint()
+
+      } else {
+        this.status.mint = !this.status.mint
+        if (!isClone) {
+          this.status.text = 'investment Clone'
+        } else if (!isValue) {
+          this.status.text = `invalid value`
+        } else if (!isFundingLimit) {
+          this.status.text = `Funding Total Limit ${this.user.fundingLimit || null}`
+        } else if (!isMin) {
+          this.status.text = `Value is min ${this.user.userFundingMinLimit}`
+        } else if (!isMax) {
+          this.status.text = `Value is Max ${this.user.userFundingMaxLimit}`
+        } else if (!isMaxValue) {
+          this.status.text = 'Insufficient Balance'
+        }
+
+        // else if (!isStart) {
+        //   this.status.text = `Open Countdown ${convertToTimeUnits((this.user.ido2.startTime) - (new Date().valueOf()))}`
+        // }
+      }
+    },
+    async withdraw () {
+      const isClone = this.user.startTradeBlock !== 0
+      const isAmount = Number(this.user.invest.amount) > 0
+      const isPendingBNB = Number(this.user.invest.pendingReward) > 0
+      if (isClone && isAmount && isPendingBNB) {
+        this.status.isLoading = true
+        this.status.loadingText = 'Withdraw ...'
+        $this = this
+        const asyncMint = async () => {
+          try {
+            // const gasLimit = await estimateGas($this.contract.adtnft, 'mint', [number, $this.ref || ethers.constants.AddressZero], 1000)
+            const tx = await this.contract.investment.withdraw() // mint(number, $this.ref || ethers.constants.AddressZero)
+            await tx.wait()
+            const data = await requestPublicData(ethChainId, this.account)
+            $this.user = data.user
+            this.status.isLoading = false
+
+            $this.status.mint = true
+            $this.status.text = 'withdraw success'
+          } catch (e) {
+            this.status.isLoading = false
+            $this.status.mint = true
+            $this.status.text = 'withdraw error'
+
+            if (e.code !== 4001) {
+              $this.status.text = e?.data?.message || e.toString()
+            } else {
+              $this.status.text = 'User Rejected'
+            }
+          }
+        }
+        asyncMint()
+
+      } else {
+        this.status.mint = !this.status.mint
+        if (!isClone) {
+          this.status.text = 'investment Clone'
+        } else if (!isAmount) {
+          this.status.text = 'not participating'
+        } else if (!isPendingBNB) {
+          this.status.text = 'Can claim 0'
+        }
+
+      }
+    },
+
+    async mint (value) {
+      value = Number(value)
+      const isValue = value !== 0
+      console.log(`value: ${value}`)
+      const isClone = this.user.claimPeriodEnd !== 0 && this.user.claimPeriodStart !== 0
+      const isUserLimit = (Number(this.user.userClaims) + value) <= this.user.userClaimLimit;
+      const isTotal = value <= Number(this.user.totalClaimable)
+      const isBalance = Number(this.user.balance) > Number(value * Number(this.user.claimPrice))
+      if (isClone && isValue && isUserLimit && isTotal && isBalance) {
+        this.status.isLoading = true
+        this.status.loadingText = "Mint ..."
+        $this = this
+        const asyncMint = async () => {
+          try {
+            // const gasLimit = await estimateGas($this.contract.adtnft, 'mint', [number, $this.ref || ethers.constants.AddressZero], 1000)
+            const tx = await this.contract.mint.claim(value, { value: ethers.utils.parseEther(`${Number(value * Number(this.user.claimPrice))}`) }) // mint(number, $this.ref || ethers.constants.AddressZero)
+            await tx.wait()
+            const data = await requestPublicData(ethChainId, this.account)
+            $this.user = data.user
+            this.status.isLoading = false
+
+            $this.status.mint = true
+            $this.status.text = 'Mint success'
+          } catch (e) {
+            this.status.isLoading = false
+            $this.status.mint = true
+            $this.status.text = 'Mint error'
+
+            if (e.code !== 4001) {
+              $this.status.text = e?.data?.message || e.toString()
+            } else {
+              $this.status.text = 'User Rejected'
+            }
+          }
+        }
+        asyncMint()
+
+      } else {
+        this.status.mint = !this.status.mint
+        if (!isClone) {
+          this.status.text = 'Mint Clone'
+        } else if (!isTotal) {
+          this.status.text = 'Mint`s done'
+        } else if (!isBalance) {
+          this.status.text = 'Insufficient Balance'
+        } else if (!isValue) {
+          this.status.text = 'Select Mint'
+        } else if (!isUserLimit){
+          this.status.text = `User Limit ${this.user.userClaimLimit}`
+        }
+
+      }
+    },
+
+    async upadteMintValue (value) {
+      console.log(`value; ${value}`)
+      this.mintValue = Number(value)
+    },
+
+    async deactivate () {
+      try {
+        if (this.link === true) {
+          this.link = false
+          this.account = []
+          this.showAccount = 'Connect'
+
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+
+    async maxAmount () {
+      const amount = this.user.balance - 0.002
+      // if(amount > Number(this.user.ido2.maxCore)){
+      //   this.inputAmount = Number(this.user.ido2.maxCore) - Number(this.user.ido2.user.amount);
+      // }else{
+      //   this.inputAmount = amount
+      // }
+      this.inputAmount = amount
+    },
+
+    handleCopy () {
+      this.status.mint = !this.status.mint
+      this.status.text = 'Copy Success'
+      var tempInput = document.createElement("input")
+      tempInput.value = this.token
+      document.body.appendChild(tempInput)
+      tempInput.select()
+      document.execCommand("copy")
+      document.body.removeChild(tempInput)
+
+      this.status.copy = true
+    },
+    setIsMint () {
+      console.log('isMint')
+      this.status.isMint = !this.status.isMint
+    },
+    upadteIsMint () {
+      this.status.isMint = !this.status.isMint
+    },
+    upadteIsApprove () {
+      this.status.isApprove = !this.status.isApprove
+    },
+    upadteCopy () {
+      this.status.copy = !this.status.copy
+    },
+    upadteMint () {
+      this.status.mint = !this.status.mint
+    },
+    setCode () {
+      this.code = this.code = 'zh' ? 'ch' : 'zh'
+    }
+  },
+  created: function () {
+    this.walletLink()
+
+  },
+
+
+}).mount('#app')
